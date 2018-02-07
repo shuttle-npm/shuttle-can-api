@@ -1,0 +1,29 @@
+{
+  "name": "shuttle-can-api",
+  "version": "1.0.1",
+  "description": "Simple web-api client for use with CanJS.",
+  "main": "shuttle-can-api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shuttle-npm/shuttle-can-api.git"
+  },
+  "keywords": [
+    "canjs",
+    "api"
+  ],
+  "author": "Eben Roux",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shuttle-npm/shuttle-can-api/issues"
+  },
+  "homepage": "https://github.com/shuttle-npm/shuttle-can-api#readme",
+  "dependencies": {
+    "can-define": "^1.5.4",
+    "can-util": "^3.10.18",
+    "jquery": "^3.2.1",
+    "shuttle-guard": "^1.0.0"
+  }
+}
