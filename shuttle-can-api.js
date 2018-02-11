@@ -89,7 +89,7 @@ let Api = DefineMap.extend(
                             resolve(response);
                         })
                         .fail(function (jqXHR, textStatus, errorThrown) {
-                            reject(errorThrown);
+                            reject(new Error(errorThrown));
                         });
                 } catch (e) {
                     reject(e);
@@ -165,7 +165,7 @@ let Api = DefineMap.extend(
                             function (error) {
                                 self.working = false;
 
-                                reject(error);
+                                reject(new Error(error));
                             });
                 }
                 catch (e) {
@@ -194,7 +194,7 @@ let Api = DefineMap.extend(
                         .catch(function (error) {
                             self.working = false;
 
-                            reject(error);
+                            reject(new Error(error));
                         });
                 }
                 catch (e) {
@@ -219,6 +219,11 @@ let Api = DefineMap.extend(
                         .then(function (response) {
                             self.working = false;
 
+                            if (!response.data) {
+                                reject(new Error("The response received does not have a 'data' attribute."));
+                                return;
+                            }
+
                             resolve(!!self.options.Map
                                 ? new self.options.Map(response)
                                 : new DefineMap(response));
@@ -226,7 +231,7 @@ let Api = DefineMap.extend(
                         .catch(function (error) {
                             self.working = false;
 
-                            reject(error);
+                            reject(new Error(error));
                         });
                 }
                 catch (e) {
@@ -252,7 +257,8 @@ let Api = DefineMap.extend(
                             self.working = false;
 
                             if (!response.data) {
-                                return response;
+                                reject(new Error("The response received does not have a 'data' attribute."));
+                                return;
                             }
 
                             const result = !!self.options.List
@@ -271,7 +277,7 @@ let Api = DefineMap.extend(
                         .catch(function (error) {
                             self.working = false;
 
-                            reject(error);
+                            reject(new Error(error));
                         });
                 }
                 catch (e) {
@@ -303,7 +309,7 @@ let Api = DefineMap.extend(
                         .catch(function (error) {
                             self.working = false;
 
-                            reject(error);
+                            reject(new Error(error));
                         });
                 }
                 catch (e) {
