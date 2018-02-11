@@ -7,19 +7,21 @@ import each from 'can-util/js/each/';
 
 const _defaultUrlProvider = {
     url: function () {
-        throw new Error('Use `import options from \'shuttle-can-api\';` to get the options call `options.wire(f)` where `f` is a function that returns the base web-api url.')
+        throw new Error('Use `import {options} from \'shuttle-can-api\';` to get the options call `options.wire(provider)` where `provider` should contain a function `url` that returns the base web-api url.')
     }
 };
 
 export const Options = DefineMap.extend({
-    _provider: _defaultUrlProvider,
+    _provider: {
+        value: _defaultUrlProvider
+    },
     wire: function (provider) {
         if (!provider) {
             this._provider = _defaultUrlProvider;
             return;
         }
 
-        if (!provider.url || typeof(provider.url !== 'function')) {
+        if (!provider.url || typeof(provider.url) !== 'function') {
             throw new Error('The `url provider` adapter has to have a `url` function that returns the url to the base web-api.')
         }
 
@@ -87,7 +89,7 @@ let Api = DefineMap.extend(
                             resolve(response);
                         })
                         .fail(function (jqXHR, textStatus, errorThrown) {
-                            reject(new Error(errorThrown));
+                            reject(errorThrown);
                         });
                 } catch (e) {
                     reject(e);
@@ -120,7 +122,16 @@ let Api = DefineMap.extend(
                 }
             } while (match);
 
-            let url = endpoint.indexOf('http') < 0 ? loader.serviceBaseURL + endpoint : endpoint;
+            var url;
+
+            if (endpoint.indexOf('http') < 0) {
+                url = options.url();
+
+                url = url + (!url.endsWith('/') ? '/' : '') + endpoint;
+            }
+            else {
+                url = endpoint;
+            }
 
             each(params,
                 function (param) {
@@ -136,102 +147,137 @@ let Api = DefineMap.extend(
         post(data) {
             guard.againstUndefined(data, 'data');
 
-            const self = this;
-            this.working = true;
+            return new Promise((resolve, reject) => {
+                try {
+                    const self = this;
+                    this.working = true;
 
-            return this._call({
-                data: data,
-                method: 'POST'
-            })
-                .then(function (response) {
-                    self.working = false;
+                    this._call({
+                        data: data,
+                        method: 'POST'
+                    })
+                        .then(
+                            function (response) {
+                                self.working = false;
 
-                    return response;
-                })
-                .catch(function (error) {
-                    self.working = false;
+                                resolve(response);
+                            },
+                            function (error) {
+                                self.working = false;
 
-                    return error;
-                });
+                                reject(error);
+                            });
+                }
+                catch (e) {
+                    reject(e);
+                }
+            });
         },
 
         put(data) {
             guard.againstUndefined(data, 'data');
 
-            const self = this;
-            this.working = true;
+            return new Promise((resolve, reject) => {
+                try {
+                    const self = this;
+                    this.working = true;
 
-            return this._call({
-                data: data,
-                method: 'POST'
-            })
-                .then(function (response) {
-                    self.working = false;
+                    this._call({
+                        data: data,
+                        method: 'POST'
+                    })
+                        .then(function (response) {
+                            self.working = false;
 
-                    return response;
-                })
-                .catch(function (error) {
-                    self.working = false;
+                            resolve(response);
+                        })
+                        .catch(function (error) {
+                            self.working = false;
 
-                    return error;
-                });
+                            reject(error);
+                        });
+                }
+                catch (e) {
+                    reject(e);
+                }
+            });
         },
 
         item(parameters) {
             const self = this;
             this.working = true;
 
-            return this._call({
-                method: 'GET',
-                parameters: parameters
-            })
-                .then(function (response) {
-                    self.working = false;
+            return new Promise((resolve, reject) => {
+                try {
+                    const self = this;
+                    this.working = true;
 
-                    return !!self.options.Map
-                        ? new self.options.Map(response)
-                        : new DefineMap(response);
-                })
-                .catch(function (error) {
-                    self.working = false;
+                    this._call({
+                        method: 'GET',
+                        parameters: parameters
+                    })
+                        .then(function (response) {
+                            self.working = false;
 
-                    return error;
-                });
+                            resolve(!!self.options.Map
+                                ? new self.options.Map(response)
+                                : new DefineMap(response));
+                        })
+                        .catch(function (error) {
+                            self.working = false;
+
+                            reject(error);
+                        });
+                }
+                catch (e) {
+                    reject(e);
+                }
+            });
         },
 
         list(parameters) {
             const self = this;
             this.working = true;
 
-            return this._call({
-                method: 'GET',
-                parameters: parameters
-            })
-                .then(function (response) {
-                    self.working = false;
+            return new Promise((resolve, reject) => {
+                try {
+                    const self = this;
+                    this.working = true;
 
-                    if (!response.data) {
-                        return response;
-                    }
+                    this._call({
+                        method: 'GET',
+                        parameters: parameters
+                    })
+                        .then(function (response) {
+                            self.working = false;
 
-                    const result = !!self.options.List
-                        ? new self.options.List()
-                        : new DefineList();
+                            if (!response.data) {
+                                return response;
+                            }
 
-                    each(response.data,
-                        (item) => {
-                            result.push(!!self.options.Map
-                                ? new self.options.Map(item)
-                                : new DefineMap(item));
+                            const result = !!self.options.List
+                                ? new self.options.List()
+                                : new DefineList();
+
+                            each(response.data,
+                                (item) => {
+                                    result.push(!!self.options.Map
+                                        ? new self.options.Map(item)
+                                        : new DefineMap(item));
+                                });
+
+                            resolve(result);
+                        })
+                        .catch(function (error) {
+                            self.working = false;
+
+                            reject(error);
                         });
-
-                    return result;
-                })
-                .catch(function (error) {
-                    self.working = false;
-
-                    return error;
-                });
+                }
+                catch (e) {
+                    reject(e);
+                }
+            });
         },
 
         'delete'(parameters) {
@@ -240,22 +286,31 @@ let Api = DefineMap.extend(
             const self = this;
             this.working = true;
 
-            return this._call({
-                method: 'DELETE',
-                parameters: parameters
-            })
-                .then(function (response) {
-                    self.working = false;
+            return new Promise((resolve, reject) => {
+                try {
+                    const self = this;
+                    this.working = true;
 
-                    return response;
-                })
-                .catch(function (error) {
-                    self.working = false;
+                    this._call({
+                        method: 'DELETE',
+                        parameters: parameters
+                    })
+                        .then(function (response) {
+                            self.working = false;
 
-                    return error;
-                });
+                            resolve(response);
+                        })
+                        .catch(function (error) {
+                            self.working = false;
+
+                            reject(error);
+                        });
+                }
+                catch (e) {
+                    reject(e);
+                }
+            });
         }
-
     }
 );
 
