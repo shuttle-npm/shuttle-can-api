@@ -1,6 +1,6 @@
 {
   "name": "shuttle-can-api",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Simple web-api client for use with CanJS.",
   "main": "shuttle-can-api.js",
   "scripts": {
@@ -21,8 +21,8 @@
   },
   "homepage": "https://github.com/shuttle-npm/shuttle-can-api#readme",
   "dependencies": {
-    "can-define": "^2.0.1",
-    "can-util": "^3.11.2",
+    "can-define": "^2.0.3",
+    "can-util": "^3.11.3",
     "jquery": "^3.3.1",
     "shuttle-guard": "^1.0.0"
   }
