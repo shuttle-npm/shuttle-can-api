@@ -43,10 +43,6 @@ let Api = DefineMap.extend(
 
         init() {
             guard.againstUndefined(this.endpoint, 'endpoint');
-
-            if (!options.url){
-                throw new Error('Use `import {options} from \'shuttle-can-api\';` to get the options and then set the api endpoint url `options.url = \'http://server-endpoint\';`.')
-            }
         },
 
         _call(options) {
@@ -117,6 +113,10 @@ let Api = DefineMap.extend(
             var url;
 
             if (endpoint.indexOf('http') < 0) {
+                if (!options.url){
+                    throw new Error('Use `import {options} from \'shuttle-can-api\';` to get the options and then set the api endpoint url `options.url = \'http://server-endpoint\';`.')
+                }
+
                 url = options.url + (!options.url.endsWith('/') ? '/' : '') + endpoint;
             }
             else {
