@@ -1,35 +1,13 @@
 import $ from 'jquery';
 import DefineMap from 'can-define/map/';
 import DefineList from 'can-define/list/';
-import loader from '@loader';
 import guard from 'shuttle-guard';
 import each from 'can-util/js/each/';
 
-const _defaultUrlProvider = {
-    url: function () {
-        throw new Error('Use `import {options} from \'shuttle-can-api\';` to get the options call `options.wire(provider)` where `provider` should contain a function `url` that returns the base web-api url.')
-    }
-};
-
 export const Options = DefineMap.extend({
-    _provider: {
-        value: _defaultUrlProvider
-    },
-    wire: function (provider) {
-        if (!provider) {
-            this._provider = _defaultUrlProvider;
-            return;
-        }
-
-        if (!provider.url || typeof(provider.url) !== 'function') {
-            throw new Error('The `url provider` adapter has to have a `url` function that returns the url to the base web-api.')
-        }
-
-        this._provider = provider;
-    },
-
-    url: function () {
-        return this._provider.url();
+    url: {
+        type: 'string',
+        default: ''
     }
 });
 
@@ -40,20 +18,34 @@ let parameterExpression = /\{.*?\}/g;
 let Api = DefineMap.extend(
     'Api',
     {
-        options: {value: {}},
-        working: {type: 'boolean', value: false},
+        endpoint: {
+            type: 'string',
+            default: ''
+        },
 
-        init(options) {
-            guard.againstUndefined(options, 'options');
+        cache: {
+            type: 'boolean',
+            default: false
+        },
 
-            this.options = (typeof options === 'string' || options instanceof String)
-                ? {endpoint: options}
-                : options;
+        working: {
+            type: 'boolean',
+            default: false
+        },
 
-            guard.againstUndefined(this.options.endpoint, 'options.endpoint');
+        Map: {
+            type: '*'
+        },
 
-            if (!this.options.cache) {
-                this.options.cache = false;
+        List: {
+            type: '*'
+        },
+
+        init() {
+            guard.againstUndefined(this.endpoint, 'endpoint');
+
+            if (!options.url){
+                throw new Error('Use `import {options} from \'shuttle-can-api\';` to get the options and then set the api endpoint url `options.url = \'http://server-endpoint\';`.')
             }
         },
 
@@ -61,7 +53,7 @@ let Api = DefineMap.extend(
             return new Promise((resolve, reject) => {
                 try {
                     const o = options || {};
-                    const parsedEndpoint = this.parseEndpoint(this.options.endpoint, o.parameters);
+                    const parsedEndpoint = this.parseEndpoint(this.endpoint, o.parameters);
                     const ajax = {
                         url: parsedEndpoint.url,
                         type: o.method,
@@ -72,7 +64,7 @@ let Api = DefineMap.extend(
 
                     switch (o.method.toLowerCase()) {
                         case 'get': {
-                            ajax.cache = this.options.cache;
+                            ajax.cache = this.cache;
                             ajax.dataType = 'json';
                             break;
                         }
@@ -125,9 +117,7 @@ let Api = DefineMap.extend(
             var url;
 
             if (endpoint.indexOf('http') < 0) {
-                url = options.url();
-
-                url = url + (!url.endsWith('/') ? '/' : '') + endpoint;
+                url = options.url + (!options.url.endsWith('/') ? '/' : '') + endpoint;
             }
             else {
                 url = endpoint;
@@ -219,13 +209,18 @@ let Api = DefineMap.extend(
                         .then(function (response) {
                             self.working = false;
 
-                            if (!response.data) {
-                                reject(new Error("The response received does not have a 'data' attribute."));
+                            if (!response) {
+                                reject(new Error("No response received."));
                                 return;
                             }
 
-                            resolve(!!self.options.Map
-                                ? new self.options.Map(response)
+                            if (!response.data) {
+                                resolve(response);
+                                return;
+                            }
+
+                            resolve(!!self.Map
+                                ? new self.Map(response)
                                 : new DefineMap(response));
                         })
                         .catch(function (error) {
@@ -256,19 +251,24 @@ let Api = DefineMap.extend(
                         .then(function (response) {
                             self.working = false;
 
-                            if (!response.data) {
-                                reject(new Error("The response received does not have a 'data' attribute."));
+                            if (!response) {
+                                reject(new Error("No response received."));
                                 return;
                             }
 
-                            const result = !!self.options.List
-                                ? new self.options.List()
+                            if (!response.data) {
+                                resolve(response);
+                                return;
+                            }
+
+                            const result = !!self.List
+                                ? new self.List()
                                 : new DefineList();
 
                             each(response.data,
                                 (item) => {
-                                    result.push(!!self.options.Map
-                                        ? new self.options.Map(item)
+                                    result.push(!!self.Map
+                                        ? new self.Map(item)
                                         : new DefineMap(item));
                                 });
 
