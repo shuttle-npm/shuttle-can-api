@@ -7,8 +7,21 @@ import Api from 'shuttle-can-api';
 var assert = chai.assert;
 
 fixture({
-    'GET http://endpoint/users': function(){
-
+    'GET /endpoint/users': function(){
+        return [
+            {
+                id: 1,
+                name: 'user-1'
+            },
+            {
+                id: 2,
+                name: 'user-2'
+            },
+            {
+                id: 3,
+                name: 'user-3'
+            }
+        ]
     }
 });
 
