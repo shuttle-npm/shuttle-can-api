@@ -35,6 +35,12 @@ fixture({
     },
     'POST /endpoint/users': function (request) {
         return request.data.message;
+    },
+    'PUT /endpoint/users/{id}': function (request) {
+        return request.data.message + '-' + request.data.id;
+    },
+    'DELETE /endpoint/users/2': function (request) {
+        return 'success';
     }
 });
 
@@ -83,6 +89,24 @@ describe('Api', function () {
         var api = new Api({endpoint: 'users'});
 
         return api.post({message: 'success'})
+            .then(function (response) {
+                assert.equal('success', response);
+            });
+    });
+
+    it('should be able to put data', function () {
+        var api = new Api({endpoint: 'users/{id}'});
+
+        return api.put({message: 'success'}, {id: 2})
+            .then(function (response) {
+                assert.equal('success-2', response);
+            });
+    });
+
+    it('should be able to delete data', function () {
+        var api = new Api({endpoint: 'users/{id}'});
+
+        return api.delete({id: 2})
             .then(function (response) {
                 assert.equal('success', response);
             });

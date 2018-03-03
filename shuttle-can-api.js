@@ -164,7 +164,7 @@ let Api = DefineMap.extend(
             });
         },
 
-        put(data) {
+        put(data, parameters) {
             guard.againstUndefined(data, 'data');
 
             return new Promise((resolve, reject) => {
@@ -174,7 +174,8 @@ let Api = DefineMap.extend(
 
                     this._call({
                         data: data,
-                        method: 'POST'
+                        parameters: parameters,
+                        method: 'PUT'
                     })
                         .then(function (response) {
                             self.working = false;
