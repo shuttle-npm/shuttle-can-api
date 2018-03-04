@@ -13,7 +13,7 @@ export const Options = DefineMap.extend({
                 throw new Error('Use `import {options} from \'shuttle-can-api\';` to get the options and then set the api endpoint url `options.url = \'http://server-endpoint\';`.')
             }
 
-            return value;
+            return value + (!value.endsWith('/') ? '/' : '') ;
         }
     }
 });
@@ -120,7 +120,7 @@ let Api = DefineMap.extend(
                     throw new Error('No \'endpoint\' has been specified.  You either need to use a full url (starting with http/https) or specify the endpoint when instantiating the api: new Api({ endpoint: \'users\' });');
                 }
 
-                url = options.url + (!options.url.endsWith('/') ? '/' : '') + endpoint;
+                url = options.url + endpoint;
             }
             else {
                 url = endpoint;
