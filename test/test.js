@@ -46,17 +46,11 @@ fixture({
 
 describe('Api', function () {
     it('should not be able to use with empty options.url and then set options.url', function () {
-        var api = new Api({endpoint: 'http://endpoint'});
+        var api = new Api();
 
         assert.throws(() => api.parseEndpoint('test'));
 
         options.url = 'http://endpoint';
-    });
-
-    it('should be able to instantiate with valid options.url', function () {
-
-
-        assert.doesNotThrow(() => new Api({endpoint: 'test'}));
     });
 
     it('should be able to parse various endpoints request urls', function () {

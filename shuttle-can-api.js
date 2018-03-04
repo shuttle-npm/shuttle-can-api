@@ -48,10 +48,6 @@ let Api = DefineMap.extend(
             type: '*'
         },
 
-        init() {
-            guard.againstUndefined(this.endpoint, 'endpoint');
-        },
-
         _call(options) {
             return new Promise((resolve, reject) => {
                 try {
@@ -120,6 +116,10 @@ let Api = DefineMap.extend(
             var url;
 
             if (endpoint.indexOf('http') < 0) {
+                if (!this.endpoint){
+                    throw new Error('No \'endpoint\' has been specified.  You either need to use a full url (starting with http/https) or specify the endpoint when instantiating the api: new Api({ endpoint: \'users\' });');
+                }
+
                 url = options.url + (!options.url.endsWith('/') ? '/' : '') + endpoint;
             }
             else {
@@ -137,7 +137,7 @@ let Api = DefineMap.extend(
             };
         },
 
-        post(data) {
+        post(data, parameters) {
             guard.againstUndefined(data, 'data');
 
             return new Promise((resolve, reject) => {
@@ -147,6 +147,7 @@ let Api = DefineMap.extend(
 
                     this._call({
                         data: data,
+                        parameters: parameters,
                         method: 'POST'
                     })
                         .then(
