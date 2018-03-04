@@ -7,7 +7,14 @@ import each from 'can-util/js/each/';
 export const Options = DefineMap.extend({
     url: {
         type: 'string',
-        default: ''
+        default: '',
+        get(value) {
+            if (!value) {
+                throw new Error('Use `import {options} from \'shuttle-can-api\';` to get the options and then set the api endpoint url `options.url = \'http://server-endpoint\';`.')
+            }
+
+            return value;
+        }
     }
 });
 
@@ -113,10 +120,6 @@ let Api = DefineMap.extend(
             var url;
 
             if (endpoint.indexOf('http') < 0) {
-                if (!options.url){
-                    throw new Error('Use `import {options} from \'shuttle-can-api\';` to get the options and then set the api endpoint url `options.url = \'http://server-endpoint\';`.')
-                }
-
                 url = options.url + (!options.url.endsWith('/') ? '/' : '') + endpoint;
             }
             else {
