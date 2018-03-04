@@ -13,7 +13,7 @@ export const Options = DefineMap.extend({
                 throw new Error('Use `import {options} from \'shuttle-can-api\';` to get the options and then set the api endpoint url `options.url = \'http://server-endpoint\';`.')
             }
 
-            return value + (!value.endsWith('/') ? '/' : '') ;
+            return value + (!value.endsWith('/') ? '/' : '');
         }
     }
 });
