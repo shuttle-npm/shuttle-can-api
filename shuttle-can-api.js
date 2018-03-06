@@ -58,13 +58,13 @@ let Api = DefineMap.extend(
                         type: o.method,
                         async: true,
                         beforeSend: o.beforeSend,
-                        timeout: o.timeout || 60000
+                        timeout: o.timeout || 60000,
+                        dataType: o.dataType || 'json'
                     };
 
                     switch (o.method.toLowerCase()) {
                         case 'get': {
                             ajax.cache = this.cache;
-                            ajax.dataType = 'json';
                             break;
                         }
                         case 'post':
