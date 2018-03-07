@@ -34,13 +34,13 @@ fixture({
         return result.length ? result[0] : undefined;
     },
     'POST /endpoint/users': function (request) {
-        return request.data.message;
+        return JSON.stringify({message: request.data.message});
     },
     'PUT /endpoint/users/{id}': function (request) {
-        return request.data.message + '-' + request.data.id;
+        return JSON.stringify({message: request.data.message + '-' + request.data.id});
     },
     'DELETE /endpoint/users/2': function (request) {
-        return 'success';
+        return JSON.stringify({message: 'success'});
     }
 });
 
@@ -88,7 +88,7 @@ describe('Api', function () {
 
         return api.post({message: 'success'})
             .then(function (response) {
-                assert.equal('success', response);
+                assert.equal('success', response.message);
             });
     });
 
@@ -97,7 +97,7 @@ describe('Api', function () {
 
         return api.put({message: 'success'}, {id: 2})
             .then(function (response) {
-                assert.equal('success-2', response);
+                assert.equal('success-2', response.message);
             });
     });
 
@@ -106,7 +106,7 @@ describe('Api', function () {
 
         return api.delete({id: 2})
             .then(function (response) {
-                assert.equal('success', response);
+                assert.equal('success', response.message);
             });
     });
 });

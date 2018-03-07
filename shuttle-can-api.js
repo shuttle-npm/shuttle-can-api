@@ -116,7 +116,7 @@ let Api = DefineMap.extend(
             var url;
 
             if (endpoint.indexOf('http') < 0) {
-                if (!this.endpoint){
+                if (!this.endpoint) {
                     throw new Error('No \'endpoint\' has been specified.  You either need to use a full url (starting with http/https) or specify the endpoint when instantiating the api: new Api({ endpoint: \'users\' });');
                 }
 
@@ -212,6 +212,8 @@ let Api = DefineMap.extend(
                         parameters: parameters
                     })
                         .then(function (response) {
+                            var data;
+
                             self.working = false;
 
                             if (!response) {
@@ -219,14 +221,11 @@ let Api = DefineMap.extend(
                                 return;
                             }
 
-                            if (!response.data) {
-                                resolve(response);
-                                return;
-                            }
+                            data = response.data || response;
 
                             resolve(!!self.Map
-                                ? new self.Map(response)
-                                : new DefineMap(response));
+                                ? new self.Map(data)
+                                : new DefineMap(data));
                         })
                         .catch(function (error) {
                             self.working = false;
@@ -254,6 +253,8 @@ let Api = DefineMap.extend(
                         parameters: parameters
                     })
                         .then(function (response) {
+                            var data;
+
                             self.working = false;
 
                             if (!response) {
@@ -261,16 +262,16 @@ let Api = DefineMap.extend(
                                 return;
                             }
 
-                            if (!response.data) {
-                                resolve(response);
+                            data = response.data || response;
+
+                            if (!!self.List) {
+                                resolve(new self.List(data));
                                 return;
                             }
 
-                            const result = !!self.List
-                                ? new self.List()
-                                : new DefineList();
+                            const result = new DefineList();
 
-                            each(response.data,
+                            each(data,
                                 (item) => {
                                     result.push(!!self.Map
                                         ? new self.Map(item)
