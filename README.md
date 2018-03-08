@@ -97,12 +97,12 @@ api.list()
     })
 ```
 
-### item(parameters)
+### map(parameters)
 
 Returns a promise that will resolve to a `DefineMap` or the specified:
 
 ```javascript
-api.item({id: 2})
+api.map({id: 2})
     .then(function (item) {
         // do something
     })

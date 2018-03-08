@@ -198,7 +198,7 @@ let Api = DefineMap.extend(
             });
         },
 
-        item(parameters) {
+        map(parameters) {
             const self = this;
             this.working = true;
 

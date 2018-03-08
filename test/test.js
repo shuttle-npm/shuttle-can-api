@@ -76,7 +76,7 @@ describe('Api', function () {
     it('should be able to get a single user', function () {
         var api = new Api({endpoint: 'users/{id}'});
 
-        return api.item({id: 2})
+        return api.map({id: 2})
             .then(function (response) {
                 assert.equal(response.id, 2);
                 assert.equal(response.name, 'user-2');
