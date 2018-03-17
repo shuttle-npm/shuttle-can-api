@@ -58,8 +58,7 @@ let Api = DefineMap.extend(
                         type: o.method,
                         async: true,
                         beforeSend: o.beforeSend,
-                        timeout: o.timeout || 60000,
-                        dataType: o.dataType || 'json'
+                        timeout: o.timeout || 60000
                     };
 
                     switch (o.method.toLowerCase()) {
