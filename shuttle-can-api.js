@@ -61,22 +61,18 @@ let Api = DefineMap.extend(
                         timeout: o.timeout || 60000
                     };
 
-                    switch (o.method.toLowerCase()) {
-                        case 'get': {
-                            ajax.cache = this.cache;
-                            break;
-                        }
-                        case 'post':
-                        case 'put': {
-                            ajax.data = JSON.stringify(o.data || {});
-                            ajax.contentType = 'application/json';
-                            break;
-                        }
+                    if (o.method.toLowerCase() === 'get') {
+                        ajax.cache = this.cache;
+                    }
+
+                    if (!!o.data){
+                        ajax.data = JSON.stringify(o.data || {});
+                        ajax.contentType = 'application/json';
                     }
 
                     $.ajax(ajax)
                         .done(function (response) {
-                            resolve(response);
+                            resolve(typeof(response) === 'string' ? eval('(' + response + ')') : response);
                         })
                         .fail(function (jqXHR, textStatus, errorThrown) {
                             reject(new Error(errorThrown));
@@ -238,19 +234,26 @@ let Api = DefineMap.extend(
             });
         },
 
-        list(parameters) {
-            const self = this;
-            this.working = true;
+        list(parameters, options) {
+            const o = options || {};
 
             return new Promise((resolve, reject) => {
                 try {
                     const self = this;
+                    var callOptions =
+                        !!o.post
+                            ? {
+                                method: 'POST',
+                                data: parameters
+                            }
+                            : {
+                                method: 'GET',
+                                parameters: parameters
+                            };
+
                     this.working = true;
 
-                    this._call({
-                        method: 'GET',
-                        parameters: parameters
-                    })
+                    this._call(callOptions)
                         .then(function (response) {
                             var data;
 
@@ -291,7 +294,7 @@ let Api = DefineMap.extend(
             });
         },
 
-        'delete'(parameters) {
+        'delete'(parameters,data) {
             guard.againstUndefined(parameters, 'parameters');
 
             const self = this;
@@ -304,7 +307,8 @@ let Api = DefineMap.extend(
 
                     this._call({
                         method: 'DELETE',
-                        parameters: parameters
+                        parameters: parameters,
+                        data: data
                     })
                         .then(function (response) {
                             self.working = false;
