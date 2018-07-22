@@ -132,39 +132,6 @@ let Api = DefineMap.extend(
 			};
 		},
 
-		getProcessedResponse(response) {
-			const self = this;
-
-			if (!response) {
-				return undefined;
-			}
-
-			var result;
-			var data = response.data || response;
-
-			if (Array.isArray(data)) {
-				if (!!self.List) {
-					return new self.List(data);
-				}
-
-				result = new DefineList();
-
-				each(data,
-					(item) => {
-						result.push(!!self.Map
-							? new self.Map(item)
-							: new DefineMap(item));
-					});
-			}
-			else {
-                result = !!self.Map
-	                ? new self.Map(data)
-	                : data
-			}
-
-			return result;
-		},
-
 		post(data, parameters) {
 			guard.againstUndefined(data, 'data');
 
@@ -182,7 +149,7 @@ let Api = DefineMap.extend(
 							function (response) {
 								self.working = false;
 
-								resolve(self.getProcessedResponse(response));
+								resolve(response);
 							},
 							function (error) {
 								self.working = false;
@@ -212,7 +179,7 @@ let Api = DefineMap.extend(
 						.then(function (response) {
 							self.working = false;
 
-							resolve(self.getProcessedResponse(response));
+							resolve(response);
 						})
 						.catch(function (error) {
 							self.working = false;
@@ -295,7 +262,22 @@ let Api = DefineMap.extend(
 								return;
 							}
 
-							resolve(self.getProcessedResponse(response));
+							var data = response.data || response;
+
+							if (!!self.List) {
+								return new self.List(data);
+							}
+
+							var result = new DefineList();
+
+							each(data,
+								(item) => {
+									result.push(!!self.Map
+										? new self.Map(item)
+										: new DefineMap(item));
+								});
+
+							resolve(result);
 						})
 						.catch(function (error) {
 							self.working = false;
