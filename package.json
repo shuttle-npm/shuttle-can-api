@@ -1,6 +1,6 @@
 {
   "name": "shuttle-can-api",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "Simple web-api client for use with CanJS.",
   "main": "shuttle-can-api.js",
   "scripts": {
