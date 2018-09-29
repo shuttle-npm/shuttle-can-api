@@ -244,7 +244,8 @@ let Api = DefineMap.extend(
                         !!o.post
                             ? {
                                 method: 'POST',
-                                data: parameters
+                                data: parameters,
+                                parameters: o.parameters
                             }
                             : {
                                 method: 'GET',
