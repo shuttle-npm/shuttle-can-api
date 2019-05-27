@@ -1,6 +1,5 @@
 import $ from 'jquery';
-import DefineMap from 'can-define/map/';
-import DefineList from 'can-define/list/';
+import { DefineMap, DefineList } from 'can';
 import guard from 'shuttle-guard';
 import each from 'can-util/js/each/';
 
