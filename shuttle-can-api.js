@@ -1,7 +1,6 @@
 import $ from 'jquery';
-import { DefineMap, DefineList } from 'can';
+import { DefineMap, DefineList, Reflect } from 'can';
 import guard from 'shuttle-guard';
-import each from 'can-util/js/each/';
 
 export const Options = DefineMap.extend({
     url: {
@@ -120,7 +119,7 @@ let Api = DefineMap.extend(
                 url = endpoint;
             }
 
-            each(params,
+            Reflect.each(params,
                 function (param) {
                     url = url.replace(`{${param.name}}`, !!p[param.name] ? p[param.name] : '');
                 });
@@ -270,7 +269,7 @@ let Api = DefineMap.extend(
 
                             var result = new DefineList();
 
-                            each(data,
+                            Reflect.each(data,
                                 (item) => {
                                     result.push(!!self.Map
                                         ? new self.Map(item)
