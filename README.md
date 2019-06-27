@@ -99,7 +99,7 @@ api.list()
 
 ### map(parameters)
 
-Returns a promise that will resolve to a `DefineMap` or the specified:
+Returns a promise that will resolve to a `DefineMap` or the specified `Map` option:
 
 ```javascript
 api.map({id: 2})
@@ -107,6 +107,8 @@ api.map({id: 2})
         // do something
     })
 ```
+
+If the data returned from the endpoint is not an `object` then a `ValueMap` is returned that simply has a `value` property.
 
 ### post(data, parameters)
 

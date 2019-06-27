@@ -2,11 +2,17 @@ import $ from 'jquery';
 import { DefineMap, DefineList, Reflect } from 'can';
 import guard from 'shuttle-guard';
 
+export const ValueMap = DefineMap.extend({
+    value: {
+        type: '*'
+    }
+});
+
 export const Options = DefineMap.extend({
     url: {
         type: 'string',
         default: '',
-        get (value) {
+        get(value) {
             if (!value) {
                 throw new Error('Use `import {options} from \'shuttle-can-api\';` to get the options and then set the api endpoint url `options.url = \'http://server-endpoint\';`.');
             }
@@ -46,7 +52,7 @@ let Api = DefineMap.extend(
             type: '*'
         },
 
-        _call (options) {
+        _call(options) {
             return new Promise((resolve, reject) => {
                 try {
                     const o = options || {};
@@ -70,7 +76,7 @@ let Api = DefineMap.extend(
 
                     $.ajax(ajax)
                         .done(function (response) {
-                            resolve(typeof(response) === 'string' ? response.trim() !== '' ? eval('(' + response + ')') : undefined : response);
+                            resolve(typeof (response) === 'string' ? response.trim() !== '' ? eval('(' + response + ')') : undefined : response);
                         })
                         .fail(function (jqXHR, textStatus, errorThrown) {
                             reject(new Error(errorThrown));
@@ -81,7 +87,7 @@ let Api = DefineMap.extend(
             });
         },
 
-        parseEndpoint (endpoint, parameters) {
+        parseEndpoint(endpoint, parameters) {
             guard.againstUndefined(endpoint, 'endpoint');
 
             const p = parameters || {};
@@ -130,7 +136,7 @@ let Api = DefineMap.extend(
             };
         },
 
-        post (data, parameters) {
+        post(data, parameters) {
             guard.againstUndefined(data, 'data');
 
             return new Promise((resolve, reject) => {
@@ -161,7 +167,7 @@ let Api = DefineMap.extend(
             });
         },
 
-        put (data, parameters) {
+        put(data, parameters) {
             guard.againstUndefined(data, 'data');
 
             return new Promise((resolve, reject) => {
@@ -191,7 +197,7 @@ let Api = DefineMap.extend(
             });
         },
 
-        map (parameters) {
+        map(parameters) {
             const self = this;
             this.working = true;
 
@@ -206,6 +212,7 @@ let Api = DefineMap.extend(
                     })
                         .then(function (response) {
                             var data;
+                            var result;
 
                             self.working = false;
 
@@ -216,9 +223,17 @@ let Api = DefineMap.extend(
 
                             data = response.data || response;
 
-                            resolve(!!self.Map
-                                ? new self.Map(data)
-                                : new DefineMap(data));
+                            if (typeof (data) == 'object') {
+                                result = !!self.Map
+                                    ? new self.Map(data)
+                                    : new DefineMap(data);
+                            } else {
+                                result = new ValueMap({
+                                    value: data
+                                });
+                            }
+
+                            resolve(result);
                         })
                         .catch(function (error) {
                             self.working = false;
@@ -232,7 +247,7 @@ let Api = DefineMap.extend(
             });
         },
 
-        list (parameters, options) {
+        list(parameters, options) {
             const o = options || {};
 
             return new Promise((resolve, reject) => {
@@ -290,7 +305,7 @@ let Api = DefineMap.extend(
             });
         },
 
-        'delete' (parameters, data) {
+        'delete'(parameters, data) {
             guard.againstUndefined(parameters, 'parameters');
 
             const self = this;
