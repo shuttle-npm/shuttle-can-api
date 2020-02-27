@@ -39,11 +39,6 @@ let Api = DefineMap.extend(
             default: false
         },
 
-        working: {
-            type: 'boolean',
-            default: false
-        },
-
         Map: {
             type: '*'
         },
@@ -142,7 +137,6 @@ let Api = DefineMap.extend(
             return new Promise((resolve, reject) => {
                 try {
                     const self = this;
-                    this.working = true;
 
                     this._call({
                         data: data,
@@ -151,12 +145,9 @@ let Api = DefineMap.extend(
                     })
                         .then(
                             function (response) {
-                                self.working = false;
-
                                 resolve(response);
                             },
                             function (error) {
-                                self.working = false;
 
                                 reject(new Error(error));
                             });
@@ -173,7 +164,6 @@ let Api = DefineMap.extend(
             return new Promise((resolve, reject) => {
                 try {
                     const self = this;
-                    this.working = true;
 
                     this._call({
                         data: data,
@@ -181,13 +171,9 @@ let Api = DefineMap.extend(
                         method: 'PUT'
                     })
                         .then(function (response) {
-                            self.working = false;
-
                             resolve(response);
                         })
                         .catch(function (error) {
-                            self.working = false;
-
                             reject(new Error(error));
                         });
                 }
@@ -199,12 +185,10 @@ let Api = DefineMap.extend(
 
         map(parameters) {
             const self = this;
-            this.working = true;
 
             return new Promise((resolve, reject) => {
                 try {
                     const self = this;
-                    this.working = true;
 
                     this._call({
                         method: 'GET',
@@ -213,8 +197,6 @@ let Api = DefineMap.extend(
                         .then(function (response) {
                             var data;
                             var result;
-
-                            self.working = false;
 
                             if (!response) {
                                 reject(new Error('No response received.'));
@@ -236,8 +218,6 @@ let Api = DefineMap.extend(
                             resolve(result);
                         })
                         .catch(function (error) {
-                            self.working = false;
-
                             reject(new Error(error));
                         });
                 }
@@ -265,37 +245,33 @@ let Api = DefineMap.extend(
                                 parameters: parameters
                             };
 
-                    this.working = true;
-
                     this._call(callOptions)
                         .then(function (response) {
-                            self.working = false;
-
                             if (!response) {
                                 reject(new Error('No response received.'));
                                 return;
                             }
 
                             var data = response.data || response;
+                            var result;
 
                             if (!!self.List) {
-                                return new self.List(data);
+                                result = new self.List(data);
                             }
+                            else {
+                                result = new DefineList();
 
-                            var result = new DefineList();
-
-                            Reflect.each(data,
-                                (item) => {
-                                    result.push(!!self.Map
-                                        ? new self.Map(item)
-                                        : new DefineMap(item));
-                                });
+                                Reflect.each(data,
+                                    (item) => {
+                                        result.push(!!self.Map
+                                            ? new self.Map(item)
+                                            : new DefineMap(item));
+                                    });
+                            }
 
                             resolve(result);
                         })
                         .catch(function (error) {
-                            self.working = false;
-
                             reject(new Error(error));
                         });
                 }
@@ -306,15 +282,9 @@ let Api = DefineMap.extend(
         },
 
         'delete'(parameters, data) {
-            guard.againstUndefined(parameters, 'parameters');
-
-            const self = this;
-            this.working = true;
-
             return new Promise((resolve, reject) => {
                 try {
                     const self = this;
-                    this.working = true;
 
                     this._call({
                         method: 'DELETE',
@@ -322,13 +292,9 @@ let Api = DefineMap.extend(
                         data: data
                     })
                         .then(function (response) {
-                            self.working = false;
-
                             resolve(response);
                         })
                         .catch(function (error) {
-                            self.working = false;
-
                             reject(new Error(error));
                         });
                 }
